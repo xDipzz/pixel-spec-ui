@@ -7,6 +7,7 @@ import { StatusBar } from '@/components/tool/StatusBar';
 import { DocsModal } from '@/components/tool/DocsModal';
 import { ShortcutsModal } from '@/components/tool/ShortcutsModal';
 import { SettingsModal } from '@/components/tool/SettingsModal';
+import { AnalysisResultModal } from '@/components/tool/AnalysisResultModal';
 import { useToolStore } from '@/lib/tool-store';
 import { getExportContent } from '@/lib/export-generators';
 import { toast } from 'sonner';
@@ -104,6 +105,7 @@ const Index = () => {
       <DocsModal open={docsOpen} onOpenChange={setDocsOpen} />
       <ShortcutsModal open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
       <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
+      <AnalysisResultModal />
     </div>
   );
 };
