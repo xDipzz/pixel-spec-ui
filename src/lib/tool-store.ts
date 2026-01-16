@@ -15,6 +15,7 @@ interface ToolState {
   // Status
   status: ToolStatus;
   analysisProgress: number;
+  resultModalOpen: boolean;
   
   // Selection
   selectedElementId: string | null;
@@ -48,6 +49,7 @@ interface ToolState {
   setDesignTokens: (tokens: DesignToken) => void;
   setUploadedImage: (image: string | null, name?: string | null) => void;
   setStatus: (status: ToolStatus) => void;
+  setResultModalOpen: (open: boolean) => void;
   analyzeScreenshot: () => Promise<void>;
   setSelectedElementId: (id: string | null) => void;
   toggleOverlays: () => void;
@@ -77,6 +79,7 @@ export const useToolStore = create<ToolState>((set, get) => ({
   imageName: null,
   status: 'idle',
   analysisProgress: 0,
+  resultModalOpen: false,
   selectedElementId: null,
   overlaysEnabled: true,
   gridEnabled: false,
@@ -102,16 +105,15 @@ export const useToolStore = create<ToolState>((set, get) => ({
   }),
   
   setStatus: (status) => set({ status }),
+  setResultModalOpen: (open) => set({ resultModalOpen: open }),
 
   analyzeScreenshot: async () => {
     const { uploadedImage } = get();
     if (!uploadedImage) return;
 
-    set({ status: 'analyzing', analysisProgress: 0 });
+    set({ status: 'analyzing', analysisProgress: 0, resultModalOpen: false });
 
     try {
-      // In a real app, we would load the image to get dimensions.
-      // Here we assume standard mock dimensions or "100x100" scale for our mock engine.
       const engine = new AnalysisEngine();
       
       const { elements, designTokens } = await engine.runAnalysis(uploadedImage, 100, 100, (progress) => {
@@ -123,7 +125,7 @@ export const useToolStore = create<ToolState>((set, get) => ({
         designTokens,
         status: 'done', 
         analysisProgress: 100,
-        // Reset expanded layers based on new elements
+        resultModalOpen: true,
         expandedLayers: new Set(elements.map(e => e.id)) 
       });
     } catch (error) {
@@ -161,7 +163,7 @@ export const useToolStore = create<ToolState>((set, get) => ({
   }),
   
   expandAllLayers: () => set({ 
-    expandedLayers: new Set(['app_shell', 'sidebar', 'main', 'right_panel', 'header_tabs', 'post_1', 'subscribe_card']),
+    expandedLayers: new Set(get().elements.map(e => e.id)),
     allLayersExpanded: true 
   }),
   
@@ -182,5 +184,6 @@ export const useToolStore = create<ToolState>((set, get) => ({
     zoom: 100,
     elements: mockElements,
     designTokens: mockTokens,
+    resultModalOpen: false,
   }),
 }));

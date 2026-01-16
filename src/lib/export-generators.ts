@@ -1,66 +1,71 @@
 import { UIElement } from './types';
 
-export const generateSpec = (el: UIElement): string => {
-  const lines = [
-    `# ${el.name}`,
-    `id: ${el.id}`,
-    `type: ${el.type}`,
-    ``,
-    `## Bounds`,
-    `x: ${el.bounds.x}%`,
-    `y: ${el.bounds.y}%`,
-    `w: ${el.bounds.width}%`,
-    `h: ${el.bounds.height}%`,
-  ];
+export const generatePrompt = (el: UIElement): string => {
+  const parts: string[] = [];
 
-  if (el.styles.width || el.styles.height) {
-     lines.push(`width: ${el.styles.width || 'auto'}`);
-     lines.push(`height: ${el.styles.height || 'auto'}`);
-  }
+  parts.push(`UI SPECIFICATION: ${el.name.toUpperCase()}`);
+  parts.push(`==========================================`);
+  parts.push(``);
 
-  if (el.styles.display || el.styles.flexDirection || el.styles.justifyContent || el.styles.alignItems) {
-    lines.push(``, `## Layout`);
-    if (el.styles.display) lines.push(`display: ${el.styles.display}`);
-    if (el.styles.flexDirection) lines.push(`direction: ${el.styles.flexDirection}`);
-    if (el.styles.justifyContent) lines.push(`justify: ${el.styles.justifyContent}`);
-    if (el.styles.alignItems) lines.push(`align: ${el.styles.alignItems}`);
-    if (el.styles.gap) lines.push(`gap: ${el.styles.gap}px`);
-  }
+  // 1. Role & Identity
+  parts.push(`COMPONENT ROLE:`);
+  parts.push(`This element is a ${el.type}. Its primary role is ${el.type === 'container' ? 'to group related child elements' : 'to display ' + el.type + ' information'}.`);
+  parts.push(``);
 
-  if (el.styles.margin) {
-    lines.push(``, `## Margin`);
-    lines.push(`${el.styles.margin.top} ${el.styles.margin.right} ${el.styles.margin.bottom} ${el.styles.margin.left}`);
-  }
-
+  // 2. Geometry & Spacing
+  parts.push(`GEOMETRY & POSITION:`);
+  parts.push(`- The component is located at X: ${Math.round(el.bounds.x)}% and Y: ${Math.round(el.bounds.y)}% within its parent context.`);
+  parts.push(`- It has a fixed dimension of ${Math.round(el.bounds.width)}px width and ${Math.round(el.bounds.height)}px height.`);
+  
   if (el.styles.padding) {
-    lines.push(``, `## Padding`);
-    lines.push(`${el.styles.padding.top}px ${el.styles.padding.right}px ${el.styles.padding.bottom}px ${el.styles.padding.left}px`);
+    const { top, right, bottom, left } = el.styles.padding;
+    parts.push(`- Internal spacing (padding) is configured as: Top: ${top}px, Right: ${right}px, Bottom: ${bottom}px, Left: ${left}px.`);
   }
+  
+  if (el.styles.gap) {
+    parts.push(`- It maintains a consistent gap of ${el.styles.gap}px between its internal child elements.`);
+  }
+  parts.push(``);
 
+  // 3. Visual Styling
+  parts.push(`VISUAL STYLING:`);
+  if (el.styles.background) {
+    parts.push(`- Background: It uses a solid fill of ${el.styles.background}.`);
+  }
+  if (el.styles.borderRadius) {
+    parts.push(`- Corner Radius: All corners are rounded to ${el.styles.borderRadius}.`);
+  }
+  if (el.styles.border) {
+    parts.push(`- Border: It has a stroke defined as "${el.styles.border}".`);
+  }
+  if (el.styles.opacity !== undefined) {
+    parts.push(`- Opacity: The element has a transparency level of ${el.styles.opacity * 100}%.`);
+  }
+  parts.push(``);
+
+  // 4. Typography
   if (el.styles.fontSize || el.styles.fontWeight || el.styles.color) {
-    lines.push(``, `## Typography`);
-    if (el.styles.fontSize) lines.push(`size: ${el.styles.fontSize}`);
-    if (el.styles.fontWeight) lines.push(`weight: ${el.styles.fontWeight}`);
-    if (el.styles.lineHeight) lines.push(`line-height: ${el.styles.lineHeight}`);
-    if (el.styles.letterSpacing) lines.push(`letter-spacing: ${el.styles.letterSpacing}`);
-    if (el.styles.color) lines.push(`color: ${el.styles.color}`);
-    if (el.styles.textAlign) lines.push(`align: ${el.styles.textAlign}`);
+    parts.push(`TYPOGRAPHY DETAILS:`);
+    if (el.content) parts.push(`- Display Text: "${el.content}"`);
+    if (el.styles.fontSize) parts.push(`- Font Size: ${el.styles.fontSize}`);
+    if (el.styles.fontWeight) parts.push(`- Font Weight: ${el.styles.fontWeight}`);
+    if (el.styles.lineHeight) parts.push(`- Line Height: ${el.styles.lineHeight}`);
+    if (el.styles.color) parts.push(`- Text Color: ${el.styles.color}`);
+    if (el.styles.textAlign) parts.push(`- Text Alignment: ${el.styles.textAlign}`);
+    parts.push(``);
   }
 
-  if (el.styles.background || el.styles.border || el.styles.borderRadius || el.styles.opacity) {
-    lines.push(``, `## Visual`);
-    if (el.styles.background) lines.push(`background: ${el.styles.background}`);
-    if (el.styles.border) lines.push(`border: ${el.styles.border}`);
-    if (el.styles.borderRadius) lines.push(`radius: ${el.styles.borderRadius}`);
-    if (el.styles.boxShadow) lines.push(`shadow: ${el.styles.boxShadow}`);
-    if (el.styles.opacity !== undefined) lines.push(`opacity: ${el.styles.opacity}`);
+  // 5. Layout Behavior
+  if (el.styles.display || el.styles.flexDirection) {
+    parts.push(`LAYOUT BEHAVIOR:`);
+    parts.push(`- The element uses a ${el.styles.display || 'block'} layout model.`);
+    if (el.styles.flexDirection) {
+      parts.push(`- Children are stacked in a ${el.styles.flexDirection} direction.`);
+      parts.push(`- Alignment: ${el.styles.justifyContent || 'start'} (horizontal) and ${el.styles.alignItems || 'start'} (vertical).`);
+    }
   }
 
-  if (el.content) {
-    lines.push(``, `## Content`, `"${el.content}"`);
-  }
-
-  return lines.join('\n');
+  return parts.join('\n');
 };
 
 export const generateJSON = (el: UIElement): string => {
@@ -147,7 +152,7 @@ export const generateCSS = (el: UIElement): string => {
 
 export const getExportContent = (el: UIElement, tab: 'spec' | 'json' | 'tailwind' | 'css'): string => {
   switch (tab) {
-    case 'spec': return generateSpec(el);
+    case 'spec': return generatePrompt(el);
     case 'json': return generateJSON(el);
     case 'tailwind': return generateTailwind(el);
     case 'css': return generateCSS(el);

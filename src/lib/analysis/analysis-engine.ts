@@ -1,5 +1,5 @@
 import { AnalysisRegion, AnalysisConfig, TileAnalysisResult, RawDetection } from './types';
-import { GeminiSimulator } from './gemini-simulator';
+import { AiService } from './ai-service';
 import { PixelProcessor } from './pixel-processor';
 import { UIElement, ElementType, ElementBounds, ElementStyles, DesignToken } from '../types';
 
@@ -32,7 +32,7 @@ export class AnalysisEngine {
         name: i === 0 ? 'background' : `color-${i}`, 
         value: c 
       })),
-      typography: [ // These would be inferred from text analysis later
+      typography: [ 
         { name: 'body', size: '16px', weight: '400' },
         { name: 'heading', size: '24px', weight: '700' }
       ],
@@ -49,18 +49,16 @@ export class AnalysisEngine {
     if (onProgress) onProgress(0.2);
     const regions = this.generateRegions(width, height);
     
-    // 2. Analyze (in parallel or sequence)
+    // 2. Analyze (Powered by Groq/GLM)
     const results = new Map<string, TileAnalysisResult>();
     let completed = 0;
 
-    // Run in parallel chunks
     const chunkSize = 3;
     for (let i = 0; i < regions.length; i += chunkSize) {
       const chunk = regions.slice(i, i + chunkSize);
       await Promise.all(chunk.map(async (region) => {
-        // Here we pass the specific region. 
-        // In real impl, we would crop the image here.
-        const detections = await GeminiSimulator.analyzeRegion(region, width, height);
+        // CALLING REAL AI SERVICE
+        const detections = await AiService.analyzeRegion(region, imageSrc);
         results.set(region.id, {
           regionId: region.id,
           detections,
