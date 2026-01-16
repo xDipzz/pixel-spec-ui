@@ -19,6 +19,7 @@ interface ToolState {
   
   // Selection
   selectedElementId: string | null;
+  hoveredElementId: string | null;
   
   // View toggles
   overlaysEnabled: boolean;
@@ -52,6 +53,7 @@ interface ToolState {
   setResultModalOpen: (open: boolean) => void;
   analyzeScreenshot: () => Promise<void>;
   setSelectedElementId: (id: string | null) => void;
+  setHoveredElementId: (id: string | null) => void;
   toggleOverlays: () => void;
   toggleGrid: () => void;
   toggleTooltip: () => void;
@@ -81,6 +83,7 @@ export const useToolStore = create<ToolState>((set, get) => ({
   analysisProgress: 0,
   resultModalOpen: false,
   selectedElementId: null,
+  hoveredElementId: null,
   overlaysEnabled: true,
   gridEnabled: false,
   tooltipEnabled: true,
@@ -126,7 +129,7 @@ export const useToolStore = create<ToolState>((set, get) => ({
         status: 'done', 
         analysisProgress: 100,
         resultModalOpen: true,
-        selectedElementId: elements.find(e => e.parentId === null)?.id || elements[0]?.id || null, // AUTO SELECT ROOT
+        selectedElementId: elements.find(e => e.parentId === null)?.id || elements[0]?.id || null,
         expandedLayers: new Set(elements.map(e => e.id)) 
       });
     } catch (error) {
@@ -136,6 +139,7 @@ export const useToolStore = create<ToolState>((set, get) => ({
   },
   
   setSelectedElementId: (id) => set({ selectedElementId: id }),
+  setHoveredElementId: (id) => set({ hoveredElementId: id }),
   
   toggleOverlays: () => set((state) => ({ overlaysEnabled: !state.overlaysEnabled })),
   
@@ -182,6 +186,7 @@ export const useToolStore = create<ToolState>((set, get) => ({
     imageName: null,
     status: 'idle',
     selectedElementId: null,
+    hoveredElementId: null,
     zoom: 100,
     elements: mockElements,
     designTokens: mockTokens,

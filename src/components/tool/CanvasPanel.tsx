@@ -3,20 +3,75 @@ import { ZoomIn, ZoomOut, RotateCcw, Eye, EyeOff, Grid3X3, MessageSquare, Upload
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToolStore } from '@/lib/tool-store';
-import { mockElements } from '@/lib/mock-elements';
 
 export const CanvasPanel = () => {
   const {
     uploadedImage, status, selectedElementId, setSelectedElementId,
+    hoveredElementId, setHoveredElementId,
     overlaysEnabled, toggleOverlays, gridEnabled, toggleGrid,
     tooltipEnabled, toggleTooltip, zoom, zoomIn, zoomOut, resetZoom,
-    setUploadedImage, setMousePosition
+    setUploadedImage, setMousePosition, elements
   } = useToolStore();
 
   const [isDragging, setIsDragging] = useState(false);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const isReady = status === 'done';
+  const selectedEl = elements.find(e => e.id === selectedElementId);
+  const hoveredEl = elements.find(e => e.id === hoveredElementId);
+
+  // Spacing Guide logic
+  const renderSpacingGuides = () => {
+    if (!selectedEl || !hoveredEl || selectedEl.id === hoveredEl.id) return null;
+
+    const s = selectedEl.bounds;
+    const h = hoveredEl.bounds;
+
+    const guides = [];
+
+    // Vertical Distance
+    if (h.y > s.y + s.height) { // Hovered is below selected
+      guides.push(
+        <div key="v-dist" className="absolute border-l border-dashed border-primary/60 z-30 pointer-events-none" 
+             style={{ left: `${s.x + s.width/2}%`, top: `${s.y + s.height}%`, height: `${h.y - (s.y + s.height)}%` }}>
+          <span className="absolute top-1/2 left-1 -translate-y-1/2 bg-primary text-black text-[8px] px-1 rounded font-bold font-mono shadow-[0_0_10px_rgba(var(--primary),0.5)]">
+            {Math.round(h.y - (s.y + s.height))}
+          </span>
+        </div>
+      );
+    } else if (s.y > h.y + h.height) { // Hovered is above selected
+      guides.push(
+        <div key="v-dist-top" className="absolute border-l border-dashed border-primary/60 z-30 pointer-events-none" 
+             style={{ left: `${s.x + s.width/2}%`, top: `${h.y + h.height}%`, height: `${s.y - (h.y + h.height)}%` }}>
+          <span className="absolute top-1/2 left-1 -translate-y-1/2 bg-primary text-black text-[8px] px-1 rounded font-bold font-mono shadow-[0_0_10px_rgba(var(--primary),0.5)]">
+            {Math.round(s.y - (h.y + h.height))}
+          </span>
+        </div>
+      );
+    }
+
+    // Horizontal Distance
+    if (h.x > s.x + s.width) { // Hovered is right of selected
+      guides.push(
+        <div key="h-dist" className="absolute border-t border-dashed border-primary/60 z-30 pointer-events-none" 
+             style={{ top: `${s.y + s.height/2}%`, left: `${s.x + s.width}%`, width: `${h.x - (s.x + s.width)}%` }}>
+          <span className="absolute left-1/2 top-1 -translate-x-1/2 bg-primary text-black text-[8px] px-1 rounded font-bold font-mono shadow-[0_0_10px_rgba(var(--primary),0.5)]">
+            {Math.round(h.x - (s.x + s.width))}
+          </span>
+        </div>
+      );
+    } else if (s.x > h.x + h.width) { // Hovered is left of selected
+      guides.push(
+        <div key="h-dist-left" className="absolute border-t border-dashed border-primary/60 z-30 pointer-events-none" 
+             style={{ top: `${s.y + s.height/2}%`, left: `${h.x + h.width}%`, width: `${s.x - (h.x + h.width)}%` }}>
+          <span className="absolute left-1/2 top-1 -translate-x-1/2 bg-primary text-black text-[8px] px-1 rounded font-bold font-mono shadow-[0_0_10px_rgba(var(--primary),0.5)]">
+            {Math.round(s.x - (h.x + h.width))}
+          </span>
+        </div>
+      );
+    }
+
+    return guides;
+  };
 
   const handleFile = useCallback((file: File) => {
     if (file.type.startsWith('image/')) {
@@ -148,9 +203,10 @@ export const CanvasPanel = () => {
             {/* Bounding boxes */}
             {isReady && overlaysEnabled && (
               <div className="absolute inset-0">
-                {mockElements.filter(el => el.id !== 'app_shell').map(el => {
+                {renderSpacingGuides()}
+                {elements.filter(el => el.id !== 'app_shell').map(el => {
                   const isSelected = selectedElementId === el.id;
-                  const isHovered = hoveredId === el.id;
+                  const isHovered = hoveredElementId === el.id;
                   
                   return (
                     <Tooltip key={el.id} open={tooltipEnabled && isHovered && !isSelected}>
@@ -165,14 +221,14 @@ export const CanvasPanel = () => {
                             opacity: isHovered || isSelected ? 1 : 0.35,
                           }}
                           onClick={(e) => { e.stopPropagation(); setSelectedElementId(el.id); }}
-                          onMouseEnter={() => setHoveredId(el.id)}
-                          onMouseLeave={() => setHoveredId(null)}
+                          onMouseEnter={() => setHoveredElementId(el.id)}
+                          onMouseLeave={() => setHoveredElementId(null)}
                         />
                       </TooltipTrigger>
                       <TooltipContent side="top" className="font-mono text-[9px] px-1.5 py-0.5 bg-popover/95 backdrop-blur">
                         <span className="text-primary">{el.name}</span>
                         <span className="text-muted-foreground mx-1">•</span>
-                        <span className="text-muted-foreground">{el.bounds.width}×{el.bounds.height}</span>
+                        <span className="text-muted-foreground">{Math.round(el.bounds.width)}×{Math.round(el.bounds.height)}</span>
                         <span className="text-muted-foreground mx-1">•</span>
                         <span className="text-muted-foreground/70">#{el.id}</span>
                       </TooltipContent>
