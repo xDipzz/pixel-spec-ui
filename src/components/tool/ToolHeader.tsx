@@ -18,7 +18,7 @@ const statusStyles: Record<ToolStatus, string> = {
 };
 
 export const ToolHeader = ({ onOpenDocs, onOpenShortcuts, onOpenSettings }: ToolHeaderProps) => {
-  const { status, uploadedImage, reset, setUploadedImage, analyzeScreenshot, analysisProgress } = useToolStore();
+  const { status, uploadedImage, reset, setUploadedImage, analyzeScreenshot, analysisProgress, setResultModalOpen } = useToolStore();
 
   const handleLoadSample = () => {
     import('@/assets/sample-screenshot.png').then((module) => {
@@ -74,6 +74,18 @@ export const ToolHeader = ({ onOpenDocs, onOpenShortcuts, onOpenSettings }: Tool
           <Cpu className="w-3 h-3" />
           Analyze <kbd className="kbd ml-0.5 bg-primary-foreground/20 border-primary-foreground/30 text-primary-foreground">A</kbd>
         </Button>
+
+        {status === 'done' && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setResultModalOpen(true)}
+            className="compact-btn border-primary/50 text-primary hover:bg-primary/10"
+          >
+            <FileText className="w-3 h-3" />
+            View Report
+          </Button>
+        )}
 
         <div className="toolbar-separator" />
 

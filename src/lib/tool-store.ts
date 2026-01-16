@@ -126,6 +126,7 @@ export const useToolStore = create<ToolState>((set, get) => ({
         status: 'done', 
         analysisProgress: 100,
         resultModalOpen: true,
+        selectedElementId: elements.find(e => e.parentId === null)?.id || elements[0]?.id || null, // AUTO SELECT ROOT
         expandedLayers: new Set(elements.map(e => e.id)) 
       });
     } catch (error) {
