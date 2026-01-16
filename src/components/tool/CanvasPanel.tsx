@@ -128,10 +128,14 @@ export const CanvasPanel = () => {
         )}
 
         {!uploadedImage ? (
-          <div className={`h-full flex flex-col items-center justify-center border border-dashed rounded transition-colors cursor-pointer ${isDragging ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40'}`}>
-            <Upload className={`w-8 h-8 mb-3 ${isDragging ? 'text-primary' : 'text-muted-foreground/50'}`} />
-            <p className="text-[11px] font-medium mb-1">{isDragging ? 'Drop here' : 'Drop / Click / Paste'}</p>
-            <p className="text-[10px] text-muted-foreground"><kbd className="kbd">Ctrl+V</kbd></p>
+          <div className="h-full flex items-center justify-center p-12">
+            <div className={`w-full max-w-[280px] aspect-[4/3] flex flex-col items-center justify-center border border-dashed rounded-xl transition-all cursor-pointer ${isDragging ? 'border-primary bg-primary/10 scale-105' : 'border-border hover:border-primary/40 hover:bg-muted/5'}`}>
+              <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center mb-3">
+                <Upload className={`w-5 h-5 ${isDragging ? 'text-primary' : 'text-muted-foreground/50'}`} />
+              </div>
+              <p className="text-[11px] font-bold tracking-tight mb-1">{isDragging ? 'Drop to start' : 'Click or Drop Image'}</p>
+              <p className="text-[9px] text-muted-foreground/60 font-mono"><kbd className="kbd px-1.5 py-0.5">Ctrl+V</kbd> to paste</p>
+            </div>
           </div>
         ) : (
           <div
