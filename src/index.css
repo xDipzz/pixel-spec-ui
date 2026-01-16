@@ -1,0 +1,193 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 90%;
+
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 90%;
+
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 90%;
+
+    --primary: 142 72% 42%;
+    --primary-foreground: 0 0% 4%;
+
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 80%;
+
+    --muted: 0 0% 8%;
+    --muted-foreground: 0 0% 50%;
+
+    --accent: 142 72% 42%;
+    --accent-foreground: 0 0% 4%;
+
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 0 0% 90%;
+
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
+    --ring: 142 72% 42%;
+    --radius: 0.25rem;
+
+    /* Neon accents */
+    --neon: 142 72% 42%;
+    --neon-cyan: 180 80% 45%;
+    --neon-yellow: 50 100% 50%;
+    --neon-orange: 25 100% 50%;
+    --neon-pink: 330 90% 55%;
+    --neon-purple: 270 80% 55%;
+
+    /* Element type colors */
+    --el-container: 210 80% 55%;
+    --el-text: 50 100% 55%;
+    --el-button: 142 72% 42%;
+    --el-input: 180 80% 45%;
+    --el-image: 270 80% 55%;
+    --el-card: 330 90% 55%;
+    --el-icon: 25 100% 55%;
+    --el-nav: 210 80% 55%;
+
+    --glow: 0 0 8px hsl(142 72% 42% / 0.4);
+    --glow-strong: 0 0 12px hsl(142 72% 42% / 0.5), 0 0 24px hsl(142 72% 42% / 0.3);
+
+    --sidebar-background: 0 0% 6%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 142 72% 42%;
+    --sidebar-primary-foreground: 0 0% 4%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 0 0% 80%;
+    --sidebar-border: 0 0% 14%;
+    --sidebar-ring: 142 72% 42%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 13px;
+  }
+  code, pre, .font-mono, .mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply bg-card border-r border-border;
+  }
+
+  .panel-header {
+    @apply h-7 px-2 flex items-center justify-between border-b border-border text-[10px] font-semibold uppercase tracking-widest text-muted-foreground;
+  }
+
+  .tree-item {
+    @apply flex items-center gap-1.5 px-1.5 py-0.5 text-[11px] cursor-pointer transition-colors rounded-sm;
+  }
+  .tree-item:hover {
+    @apply bg-secondary/60;
+  }
+  .tree-item.selected {
+    @apply bg-primary/20 text-primary;
+    box-shadow: inset 2px 0 0 hsl(var(--primary));
+  }
+
+  .el-badge {
+    @apply px-1 py-px rounded text-[9px] font-mono font-semibold uppercase;
+  }
+
+  .inspector-section {
+    @apply border-b border-border;
+  }
+  .inspector-section-header {
+    @apply flex items-center justify-between px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground cursor-pointer hover:bg-secondary/30;
+  }
+  .inspector-row {
+    @apply flex items-center justify-between px-2 py-0.5 text-[11px];
+  }
+  .inspector-label {
+    @apply text-muted-foreground font-mono;
+  }
+  .inspector-value {
+    @apply font-mono text-foreground;
+  }
+
+  .code-block {
+    @apply bg-muted/40 rounded text-[10px] font-mono overflow-auto border border-border/50 leading-relaxed;
+  }
+
+  .bounding-box {
+    @apply absolute border border-primary/50 pointer-events-auto cursor-pointer transition-all duration-75;
+  }
+  .bounding-box:hover {
+    @apply border-primary bg-primary/10;
+    box-shadow: var(--glow);
+  }
+  .bounding-box.selected {
+    @apply border-primary bg-primary/15 border-2;
+    box-shadow: var(--glow-strong);
+  }
+
+  .status-badge {
+    @apply px-1.5 py-px rounded text-[9px] font-mono font-bold uppercase tracking-wide;
+  }
+
+  .kbd {
+    @apply inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded bg-secondary border border-border text-[9px] font-mono text-muted-foreground;
+  }
+
+  .compact-btn {
+    @apply h-6 px-2 text-[11px] gap-1 font-medium;
+  }
+
+  .compact-icon-btn {
+    @apply h-5 w-5 p-0;
+  }
+
+  .toolbar-separator {
+    @apply w-px h-3 bg-border mx-1;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 2px;
+  }
+
+  .neon-text {
+    color: hsl(var(--neon));
+    text-shadow: 0 0 6px hsl(var(--neon) / 0.5);
+  }
+
+  .scanlines {
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      hsl(var(--neon) / 0.015) 2px,
+      hsl(var(--neon) / 0.015) 4px
+    );
+    pointer-events: none;
+  }
+}
