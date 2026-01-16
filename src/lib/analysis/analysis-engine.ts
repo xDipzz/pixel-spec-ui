@@ -74,8 +74,13 @@ export class AnalysisEngine {
     const mergedElements = this.mergeResults(Array.from(results.values()), width, height);
     
     // 4. Structure (Parent-Child)
-    const structuredElements = this.buildHierarchy(mergedElements);
+    let structuredElements = this.buildHierarchy(mergedElements);
     
+    // Ensure at least one root element exists
+    if (structuredElements.length > 0 && !structuredElements.some(e => e.parentId === null)) {
+       structuredElements[0].parentId = null;
+    }
+
     if (onProgress) onProgress(1.0);
     return {
       elements: structuredElements,
