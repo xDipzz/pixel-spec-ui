@@ -23,14 +23,14 @@ export const RightPanel = () => {
       </TabsList>
 
       <TabsContent value="inspector" className="flex-1 flex flex-col m-0 overflow-hidden">
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-[0.55] flex flex-col overflow-hidden">
           <InspectorPanel />
         </div>
-        <div className="h-[40%] border-t border-border flex flex-col">
-          <div className="panel-header">
-            <span className="flex items-center gap-1">
-              <Code className="w-3 h-3" />
-              Exports
+        <div className="flex-[0.45] border-t border-white/10 flex flex-col shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+          <div className="panel-header bg-white/5 border-b border-white/5">
+            <span className="flex items-center gap-1.5 text-primary">
+              <Code className="w-3.5 h-3.5" />
+              Detailed Specification
             </span>
           </div>
           <div className="flex-1 overflow-hidden">
